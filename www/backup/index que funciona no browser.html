@@ -18,58 +18,56 @@
        //document.addEventListener("deviceready", onDeviceReady, false);
          console.log("aqui foi"); 
        // Populate the database 
-       var db = window.openDatabase("Database", "1.0", "PhoneGap Demo", 200000);
-       db.transaction(queryDB, errorCB);
-       
-       function populateDB(tx) {
-           tx.executeSql('DROP TABLE IF EXISTS DEMO');
-           tx.executeSql('CREATE TABLE IF NOT EXISTS DEMO (id unique, data)');
-           tx.executeSql('INSERT INTO DEMO (id, data) VALUES (1, "First row")');
-           tx.executeSql('INSERT INTO DEMO (id, data) VALUES (2, "Second row")');
-       }
+      var db = window.openDatabase("Database", "1.0", "PhoneGap Demo", 200000);
+        db.transaction(populateDB, errorCB, successCB);
+    // PhoneGap is ready
+    //
+    $("p").html(",funciona. ");
+    // Populate the database 
+    //
+    function populateDB(tx) {
+        tx.executeSql('DROP TABLE IF EXISTS DEMO');
+        tx.executeSql('CREATE TABLE IF NOT EXISTS DEMO (id unique, data)');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (1, "fffffFirst row")');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (2, "Second row")');
+    }
 
-       // Query the database
-       //
-       function queryDB(tx) {
-           tx.executeSql('SELECT * FROM DEMO', [], querySuccess, errorCB);
-       }
+    // Query the database
+    //
+    function queryDB(tx) {
+        tx.executeSql('SELECT * FROM DEMO', [], querySuccess, errorCB);
+    }
 
-       // Query the success callback
-       //
-       function querySuccess(tx, results) {
-           // this will be empty since no rows were inserted.
-           myApp.services.tasks.create( {
-               title: results.insertId,
+    // Query the success callback
+    //
+    function querySuccess(tx, results) {
+        var len = results.rows.length;
+        console.log("foi msm DEMO table: " + len + " rows found.");
+        for (var i=0; i<len; i++){
+            myApp.services.tasks.create({
+               title: " ID = " + results.rows.item(i).id + " Data =  " + results.rows.item(i).data,
                category: 'Programming',
                description: 'Some description.',
                highlight: false,
                urgent: false
              });
-           console.log("Insert ID = " + results.insertId);
-           // this will be 0 since it is a select statement
-           console.log("Rows Affected = " + results.rowAffected);
-           // the number of rows returned by the select statement
-           console.log("Insert ID = " + results.rows.length);
-       }
+            //console.log("Row = " + i + " ID = " + results.rows.item(i).id + " Data =  " + results.rows.item(i).data);
+        }
+    }
 
-       // Transaction error callback
-       //
-       function errorCB(err) {
-           console.log("Error processing SQL: "+err.code);
-       }
+    // Transaction error callback
+    //
+    function errorCB(err) {
+        console.log("Error processing SQL: "+err.code);
+    }
 
-       // Transaction success callback
-       //
-       function successCB() {
-           
-       }
-    // PhoneGap is ready
-       //
-       function onDeviceReady() {
-            console.log("aqui tbm");
-           var db = window.openDatabase("Database", "1.0", "PhoneGap Demo", 200000);
-           db.transaction(populateDB, errorCB, successCB);
-       }
+    // Transaction success callback
+    //
+    function successCB() {
+        var db = window.openDatabase("Database", "1.0", "PhoneGap Demo", 200000);
+        db.transaction(queryDB, errorCB);
+    }
+
 });
    </script>
 </head>
